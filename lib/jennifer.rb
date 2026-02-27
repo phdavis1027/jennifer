@@ -141,10 +141,6 @@ class Jennifer
 		Module.new do
 			const_set(:GENERATOR_RECIPE__, recipe)
 
-			define_method(:initialize) do
-				@overrides = {}
-			end
-
 			recipe.generators.each do |gen|
 				define_method(gen.name) do |&override|
 					@overrides[gen.name] = override
@@ -155,13 +151,20 @@ class Jennifer
 			define_method(:generate) do
 				Jennifer.run_generators(
 					recipe.generators,
-					overrides: @overrides
+					overrides: @overrides,
+					instance: self
 				)
 			end
 
 			def self.included(base)
 				base.const_set(:GENERATOR_RECIPE__, self::GENERATOR_RECIPE__)
 				base.extend(ClassMethods)
+				base.prepend(Module.new {
+					define_method(:initialize) do |*args, **kwargs, &blk|
+						@overrides = {}
+						super(*args, **kwargs, &blk)
+					end
+				})
 
 				if self::GENERATOR_RECIPE__.block
 					recipe = self::GENERATOR_RECIPE__
@@ -182,23 +185,30 @@ class Jennifer
 
 	# @param [Array<Jennifer>] generators
 	# @param [Hash{Symbol => Proc}] overrides
+	# @param [Object, nil] instance
 	# @return [Jennifer::Result]
-	def self.run_generators(generators, overrides: {})
+	def self.run_generators(generators, overrides: {}, instance: nil)
 		resolved = {}
 		metadata = {}
 		example = {}
 
-		rantly = Rantly.singleton
+		ctx = Rantly.singleton
+		if instance
+			ctx = ctx.dup
+			instance.instance_variables.each do |ivar|
+				ctx.instance_variable_set(ivar, instance.instance_variable_get(ivar))
+			end
+		end
 
 		generators.each do |gen|
 			block = overrides[gen.name] || gen.default
 
 			value =
 				if gen.dependencies.empty?
-					rantly.instance_eval(&block)
+					ctx.instance_eval(&block)
 				else
 					dep_values = gen.dependencies.map { |dep| resolved.fetch(dep) }
-					rantly.instance_exec(*dep_values, &block)
+					ctx.instance_exec(*dep_values, &block)
 				end
 
 			key = gen.name.to_s
