@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift(File.join(__dir__, ".."))
-
 require "rantly"
 require "rantly/minitest_extensions"
 require_relative "rantly_extensions"

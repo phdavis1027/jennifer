@@ -6,3 +6,4 @@ gemspec
 
 gem "rantly", github: "Amolith/rantly"
 gem "minitest"
+gem "rake"
