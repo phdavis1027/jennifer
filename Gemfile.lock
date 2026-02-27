@@ -1,0 +1,31 @@
+GIT
+  remote: https://github.com/Amolith/rantly.git
+  revision: 7f705afe4dd157c370a69f0e336fd2acb9934f8b
+  specs:
+    rantly (2.0.0)
+
+PATH
+  remote: .
+  specs:
+    jennifer (0.0.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    drb (2.2.3)
+    minitest (6.0.2)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    prism (1.9.0)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  jennifer!
+  minitest
+  rantly!
+
+BUNDLED WITH
+   2.6.9
