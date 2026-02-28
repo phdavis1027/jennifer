@@ -148,9 +148,17 @@ class Jennifer
 				end
 			end
 
-			define_method(:generate) do
+			define_method(:generate) do |*params|
+				gens = if recipe.block && params.any?
+					dsl = Jennifer::DSL.new
+					dsl.instance_exec(*params, &recipe.block)
+					dsl.__generators.freeze
+				else
+					recipe.generators
+				end
+
 				Jennifer.run_generators(
-					recipe.generators,
+					gens,
 					overrides: @overrides,
 					instance: self
 				)
@@ -165,20 +173,6 @@ class Jennifer
 						super(*args, **kwargs, &blk)
 					end
 				})
-
-				if self::GENERATOR_RECIPE__.block
-					recipe = self::GENERATOR_RECIPE__
-					# @return [Proc] a proc that accepts the parameterized
-					#   block's arguments, re-evaluates the DSL with real
-					#   values, and returns a Jennifer::Result
-					base.define_singleton_method(:generate) do
-						proc { |*params|
-							dsl = Jennifer::DSL.new
-							dsl.instance_exec(*params, &recipe.block)
-							Jennifer.run_generators(dsl.__generators.freeze)
-						}
-					end
-				end
 			end
 		end
 	end

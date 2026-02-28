@@ -23,6 +23,6 @@ class Webhook
 		}, transient: true
 		description { string }
 		to { nanpa_phone }
-		message derived_from(:direction, :to), &Message.generate
+        message derived_from(:direction, :to), &Message.new.method(:generate)
 	}
 end
