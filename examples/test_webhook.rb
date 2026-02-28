@@ -67,4 +67,15 @@ class WebhookGeneratorTest < Minitest::Test
 		_, example = Webhook.new.description { "test event" }.generate
 		assert_equal "test event", example["description"]
 	end
+
+	def test_override_with_dependencies
+		property_of {
+			Webhook.new.direction { |type|
+				Webhook::INBOUND_TYPES.include?(type) ? "inbound" : "outbound"
+			}.generate
+		}.check { |(metadata, example)|
+			expected = Webhook::INBOUND_TYPES.include?(example["type"]) ? "inbound" : "outbound"
+			assert_equal expected, metadata["direction"]
+		}
+	end
 end
