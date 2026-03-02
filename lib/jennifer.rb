@@ -108,6 +108,10 @@ class Jennifer
 			@example = example
 		end
 
+		def to_s
+			[@metadata.to_s, @example.to_s].to_s
+		end
+
 		# @return [Array(Hash, Hash)]
 		def to_ary
 			[metadata, example]
