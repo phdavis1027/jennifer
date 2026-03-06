@@ -82,11 +82,6 @@ class Jennifer
 			end
 		end
 
-		def respond_to_missing?(method_name, _include_private = nil)
-			first_letter = method_name.to_s.each_char.first
-			first_letter.eql?(first_letter.downcase)
-		end
-
 		attr_reader :__generators
 	end
 
