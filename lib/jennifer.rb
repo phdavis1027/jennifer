@@ -75,11 +75,15 @@ class Jennifer
 		end
 
 		def method_missing(name, *args, **kwargs, &default)
-			if respond_to_missing?(name)
+			if respond_to_missing?(name, false)
 				mkgen(name, *args, **kwargs, &default)
 			else
 				super
 			end
+		end
+
+		def respond_to_missing?(method_name, include_private = false)
+			true
 		end
 
 		attr_reader :__generators
